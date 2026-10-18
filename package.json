@@ -1,0 +1,16 @@
+{
+  "name": "cardpunk",
+  "version": "1.0.0",
+  "description": "CARDPUNK - Sân Chơi Card Game Online Real-time",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node server/test-4p-3rounds.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "socket.io": "^4.8.4"
+  }
+}

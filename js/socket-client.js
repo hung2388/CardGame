@@ -9,7 +9,9 @@ class SocketClient {
     this.serverUrl = window.CARDPUNK_SERVER_URL || savedUrl || (
       window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3001'
-        : 'https://cardpunk-backend-production.up.railway.app' // Example Railway fallback
+        : (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('github.io')
+            ? 'https://cardpunk-backend-production.up.railway.app'
+            : window.location.origin)
     );
 
     this.socket = null;
