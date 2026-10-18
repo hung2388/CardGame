@@ -1,0 +1,172 @@
+/* CARDPUNK Lobby Styles */
+
+.lobby-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.lobby-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.lobby-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+}
+
+.lobby-main-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .lobby-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card Selection Pills / Cards */
+.game-cards-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.game-select-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 3px solid #000;
+  border-radius: var(--radius-md);
+  box-shadow: 3px 3px 0 #000;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.game-select-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #000;
+}
+
+.game-select-card.active {
+  background: var(--color-yellow);
+  box-shadow: 0 0 0 3px #ff5277, 5px 5px 0 #000;
+}
+
+.game-icon-sq {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #000;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: #fff;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.game-info-col {
+  flex: 1;
+}
+
+.game-name-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.game-desc-sub {
+  font-size: 13px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.game-capacity-tag {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border: 1.5px solid #000;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
+}
+
+/* Forms Card */
+.lobby-panel-box {
+  padding: 28px;
+  background: #ffffff;
+}
+
+.lobby-panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.divider-line {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 28px 0;
+  color: #94a3b8;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.divider-line::before,
+.divider-line::after {
+  content: '';
+  flex: 1;
+  border-bottom: 2px dashed #cbd5e1;
+}
+
+.divider-line:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.divider-line:not(:empty)::after {
+  margin-left: .5em;
+}
+
+.railway-guide-box {
+  margin-top: 32px;
+  padding: 16px 20px;
+  border: 2px dashed #000;
+  border-radius: var(--radius-sm);
+  background: #fffbeb;
+  font-size: 13px;
+  line-height: 1.6;
+}

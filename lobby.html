@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CARDPUNK - Sảnh Chờ & Tạo Phòng Game</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/lobby.css">
+</head>
+<body>
+
+  <div class="lobby-container">
+    <!-- Header -->
+    <header class="lobby-header-bar">
+      <a href="neobrutalism.html" class="lobby-brand">
+        <span>CARDPUNK</span>
+        <span class="nb-badge" style="background: var(--color-green); color: #fff;">LOBBY</span>
+      </a>
+
+      <div>
+        <a href="neobrutalism.html" class="nb-btn white sm">← Về Trang Chủ</a>
+      </div>
+    </header>
+
+    <div class="lobby-main-grid">
+      <!-- Left: Game Selection & Creation -->
+      <section class="lobby-panel-box nb-box">
+        <h2 class="lobby-panel-title">
+          CHỌN GAME & TẠO PHÒNG
+        </h2>
+
+        <div class="form-group">
+          <label class="form-label">Tên của bạn:</label>
+          <input type="text" id="player-name-input" class="nb-input" placeholder="Ví dụ: Chiến Thần Sâm Lốc" maxlength="20">
+        </div>
+
+        <label class="form-label" style="margin-bottom: 10px; display: block;">Chọn thể loại bài:</label>
+        <div class="game-cards-selection">
+          <div class="game-select-card active" data-game="three-cards">
+            <div class="game-info-col">
+              <div class="game-name-title">Ba Cào (3 Lá)</div>
+              <div class="game-desc-sub">Đơn giản, tốc độ nhanh, 1 ván 10 giây</div>
+            </div>
+            <div class="game-capacity-tag">2-10 người</div>
+          </div>
+
+          <div class="game-select-card" data-game="sam">
+            <div class="game-info-col">
+              <div class="game-name-title">Sâm Lốc (Miền Bắc)</div>
+              <div class="game-desc-sub">Báo sâm, chặn 2, tứ quý, cướp cái</div>
+            </div>
+            <div class="game-capacity-tag">2-5 người</div>
+          </div>
+
+          <div class="game-select-card" data-game="tan">
+            <div class="game-info-col">
+              <div class="game-name-title">Đánh Tấn (Durak)</div>
+              <div class="game-desc-sub">Chất trưởng, tấn công, phòng thủ, bồi công</div>
+            </div>
+            <div class="game-capacity-tag">2-4 người</div>
+          </div>
+
+          <div class="game-select-card" data-game="uno">
+            <div class="game-info-col">
+              <div class="game-name-title">UNO Đại Chiến</div>
+              <div class="game-desc-sub">+4 đổi màu, Skip, Cấm đè, Hô Uno</div>
+            </div>
+            <div class="game-capacity-tag">2-10 người</div>
+          </div>
+
+          <div class="game-select-card" data-game="exploding-kittens">
+            <div class="game-info-col">
+              <div class="game-name-title">Mèo Nổ (Exploding Kittens)</div>
+              <div class="game-desc-sub">Gỡ bom Defuse, Nope, See The Future</div>
+            </div>
+            <div class="game-capacity-tag">2-5 người</div>
+          </div>
+        </div>
+
+        <button id="btn-create-room" class="nb-btn pink lg" style="width: 100%;">
+          TẠO PHÒNG MỚI (CHỦ BÀN)
+        </button>
+      </section>
+
+      <!-- Right: Join Room with Code & Server Info -->
+      <section>
+        <div class="lobby-panel-box nb-box">
+          <h2 class="lobby-panel-title">
+            NHẬP MÃ PHÒNG (JOIN)
+          </h2>
+          <p style="font-size: 14px; color: #64748b; margin-bottom: 18px; font-weight: 600;">
+            Bạn bè đã gửi mã phòng 6 số cho bạn? Nhập mã vào đây để tham chiến ngay!
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Mã phòng (6 chữ số):</label>
+            <input type="text" id="room-code-input" class="nb-input" placeholder="Ví dụ: 829104" maxlength="6" style="font-size: 24px; letter-spacing: 4px; text-align: center;">
+          </div>
+
+          <button id="btn-join-room" class="nb-btn yellow lg" style="width: 100%;">
+            THAM GIA BÀN
+          </button>
+        </div>
+
+        <!-- Railway Server Manual Toggle Info Box -->
+        <div class="railway-guide-box">
+          <div style="font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            MẸO TIẾT KIỆM CREDIT RAILWAY ($1/THÁNG)
+          </div>
+          <p>
+            • Khi muốn chơi: Vào Railway Dashboard → Bật Backend service (mất ~15s khởi động).<br>
+            • Chơi xong: Tắt service để tiết kiệm $1 credit (chơi 2h/ngày tốn ~$0.12/tháng, dùng cả tháng không hết!).<br>
+            • Frontend Vercel luôn online 24/7 miễn phí.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="js/socket-client.js"></script>
+
+  <script>
+    let selectedGame = 'three-cards';
+
+    // Game card selection
+    document.querySelectorAll('.game-select-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.game-select-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedGame = card.dataset.game;
+      });
+    });
+
+    // Populate saved name
+    const savedName = sessionStorage.getItem('cardpunk_player_name');
+    if (savedName) {
+      document.getElementById('player-name-input').value = savedName;
+    }
+
+    // Init socket client
+    window.cardpunkClient.init();
+
+    // Create Room
+    document.getElementById('btn-create-room').addEventListener('click', () => {
+      const name = document.getElementById('player-name-input').value.trim() || 'Chủ Phòng';
+      sessionStorage.setItem('cardpunk_player_name', name);
+      window.location.href = `game.html?create=true&game=${selectedGame}&name=${encodeURIComponent(name)}`;
+    });
+
+    // Join Room
+    document.getElementById('btn-join-room').addEventListener('click', () => {
+      const code = document.getElementById('room-code-input').value.trim();
+      const name = document.getElementById('player-name-input').value.trim() || 'Người Chơi';
+      if (!code || code.length < 4) {
+        alert('Vui lòng nhập đúng mã phòng (6 chữ số)!');
+        return;
+      }
+      sessionStorage.setItem('cardpunk_player_name', name);
+      window.location.href = `game.html?room=${code}&name=${encodeURIComponent(name)}`;
+    });
+  </script>
+</body>
+</html>
