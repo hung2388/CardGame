@@ -92,8 +92,24 @@ class SocketClient {
         this.trigger('spin_selection_start', data);
       });
 
+      this.socket.on('cards_shuffling_notice', (data) => {
+        this.trigger('cards_shuffling_notice', data);
+      });
+
       this.socket.on('cards_dealt_notice', (data) => {
         this.trigger('cards_dealt_notice', data);
+      });
+
+      this.socket.on('card_played_action', (data) => {
+        this.trigger('card_played_action', data);
+      });
+
+      this.socket.on('card_drawn_action', (data) => {
+        this.trigger('card_drawn_action', data);
+      });
+
+      this.socket.on('tan_pickup_action', (data) => {
+        this.trigger('tan_pickup_action', data);
       });
 
       this.socket.on('round_showdown', (data) => {

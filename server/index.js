@@ -28,10 +28,15 @@ const roomManager = new RoomManager();
  * - Relative Seating: View positioned with self at 3 o'clock
  */
 function broadcastScopedRoom(room) {
-  const players = room.playerManager.getAllPlayers();
-  for (const player of players) {
-    const scopedState = room.getScopedState(player.socketId);
-    io.to(player.socketId).emit('room_state_update', scopedState);
+  try {
+    if (!room || !room.playerManager) return;
+    const players = room.playerManager.getAllPlayers();
+    for (const player of players) {
+      const scopedState = room.getScopedState(player.socketId);
+      io.to(player.socketId).emit('room_state_update', scopedState);
+    }
+  } catch (err) {
+    console.error('[Broadcast Scoped Room Error]:', err);
   }
 }
 
@@ -144,7 +149,17 @@ io.on('connection', (socket) => {
         callback({ success: true, starterSeat: roundMeta.starterSeat, direction: roundMeta.direction });
       }
 
-      // Step 2: After spin completes (4s), deal cards authoritatively
+      // Step 2: Trigger Shuffle animation right as spinner ends (3.4s)
+      setTimeout(() => {
+        if (roomManager.getRoom(room.id)) {
+          io.to(room.id).emit('cards_shuffling_notice', {
+            roomId: room.id,
+            deckCount: room.deckEngine?.remainingCount || 52
+          });
+        }
+      }, 3400);
+
+      // Step 3: Deal cards authoritatively at 4.4s
       setTimeout(() => {
         if (roomManager.getRoom(room.id)) {
           room.dealCards();
@@ -165,7 +180,7 @@ io.on('connection', (socket) => {
 
           broadcastScopedRoom(room);
         }
-      }, 4200);
+      }, 4400);
 
     } catch (err) {
       console.error('[Start Game Error]:', err);
@@ -287,9 +302,24 @@ io.on('connection', (socket) => {
       const player = room.playerManager.getPlayerBySocketId(socket.id);
       if (!player) return callback && callback({ success: false, error: 'Người chơi không hợp lệ!' });
 
-      // Anti-Cheat: Validate Turn
-      if (room.currentTurnSeat !== player.seat) {
-        return callback && callback({ success: false, error: 'Chưa đến lượt của bạn!' });
+      // Anti-Cheat: Validate Turn & Allowed Actions
+      let isAllowedTurn = (room.currentTurnSeat === player.seat);
+      if (room.gameType === 'tan' && room.gameEngine) {
+        if (player.seat === room.gameEngine.defenderSeat) {
+          // Defender can defend if there are undefended cards on table
+          isAllowedTurn = room.gameEngine.tablePairs.some(p => !p.defendCard);
+        } else {
+          // Attacker can lead, or any non-defender can pile on once attack cards exist
+          if (room.gameEngine.tablePairs.length === 0) {
+            isAllowedTurn = (player.seat === room.gameEngine.attackerSeat);
+          } else {
+            isAllowedTurn = true; // Pile-on allowed for all non-defenders
+          }
+        }
+      }
+
+      if (!isAllowedTurn) {
+        return callback && callback({ success: false, error: 'Chưa đến lượt hoặc hành động không được phép!' });
       }
 
       // Anti-Cheat: Validate Card Ownership
@@ -309,6 +339,13 @@ io.on('connection', (socket) => {
         const playRes = room.gameEngine.executePlayCards(socket.id, cardIds);
         if (!playRes.success) return callback && callback(playRes);
 
+        // Notify all clients to animate card played
+        io.to(room.id).emit('card_played_action', {
+          seat: player.seat,
+          playerName: player.name,
+          cards: playRes.combo?.cards || []
+        });
+
         if (playRes.finished) {
           console.log(`[Sâm Finished] Winner: ${playRes.results.winnerName}`);
           broadcastScopedRoom(room);
@@ -323,13 +360,23 @@ io.on('connection', (socket) => {
       // Route to Đánh Tấn game engine
       if (room.gameType === 'tan' && room.gameEngine) {
         let res;
-        if (player.seat === room.gameEngine.defenderSeat) {
+        const isDefender = (player.seat === room.gameEngine.defenderSeat);
+        if (isDefender) {
           const { targetAttackCardId } = data || {};
           res = room.gameEngine.defend(socket.id, cardIds[0], targetAttackCardId);
         } else {
           res = room.gameEngine.attack(socket.id, cardIds);
         }
         if (!res.success) return callback && callback(res);
+
+        // Notify all clients to animate card played
+        io.to(room.id).emit('card_played_action', {
+          seat: player.seat,
+          playerName: player.name,
+          cards: isDefender ? [res.defendCard || res.pair?.defendCard] : (res.attackCards || []),
+          actionType: isDefender ? 'defend' : 'attack'
+        });
+
         if (room.gameEngine.status === 'finished') {
           broadcastScopedRoom(room);
           io.to(room.id).emit('round_showdown', room.gameEngine.roundResults);
@@ -344,6 +391,14 @@ io.on('connection', (socket) => {
         const { chosenColor } = data || {};
         const playRes = room.gameEngine.playCard(socket.id, cardIds[0], chosenColor);
         if (!playRes.success) return callback && callback(playRes);
+
+        io.to(room.id).emit('card_played_action', {
+          seat: player.seat,
+          playerName: player.name,
+          cards: [playRes.card],
+          chosenColor: playRes.activeColor
+        });
+
         if (playRes.finished) {
           console.log(`[UNO Finished] Winner: ${playRes.results.winnerName}`);
           broadcastScopedRoom(room);
@@ -359,6 +414,13 @@ io.on('connection', (socket) => {
         const { targetSeat } = data || {};
         const playRes = room.gameEngine.playCard(socket.id, cardIds[0], targetSeat);
         if (!playRes.success) return callback && callback(playRes);
+
+        io.to(room.id).emit('card_played_action', {
+          seat: player.seat,
+          playerName: player.name,
+          cards: [playRes.card]
+        });
+
         broadcastScopedRoom(room);
         return callback && callback(playRes);
       }
@@ -368,6 +430,12 @@ io.on('connection', (socket) => {
       player.hand = player.hand.filter(c => !cardIds.includes(c.id));
       room.tableCards.push(...playedCards);
       room.advanceTurn();
+
+      io.to(room.id).emit('card_played_action', {
+        seat: player.seat,
+        playerName: player.name,
+        cards: playedCards
+      });
 
       console.log(`[Card Played] Player: ${player.name} (Seat ${player.seat}) | Cards: ${cardIds.join(', ')}`);
       if (typeof callback === 'function') callback({ success: true });
@@ -390,6 +458,17 @@ io.on('connection', (socket) => {
       const player = room.playerManager.getPlayerBySocketId(socket.id);
       if (!player) return callback && callback({ success: false, error: 'Người chơi không hợp lệ!' });
 
+      // Route to Đánh Tấn game engine (Attackers pass / done attacking)
+      if (room.gameType === 'tan' && room.gameEngine) {
+        if (player.seat === room.gameEngine.defenderSeat) {
+          return callback && callback({ success: false, error: 'Người phòng thủ không thể bỏ lượt, phải đỡ bài hoặc Lên Bài!' });
+        }
+        const passRes = room.gameEngine.passAttack(socket.id);
+        if (!passRes.success) return callback && callback(passRes);
+        broadcastScopedRoom(room);
+        return callback && callback(passRes);
+      }
+
       if (room.currentTurnSeat !== player.seat) {
         return callback && callback({ success: false, error: 'Chưa đến lượt của bạn!' });
       }
@@ -400,14 +479,6 @@ io.on('connection', (socket) => {
         if (!passRes.success) return callback && callback(passRes);
         broadcastScopedRoom(room);
         return callback && callback({ success: true });
-      }
-
-      // Route to Đánh Tấn game engine (Attackers pass / done attacking)
-      if (room.gameType === 'tan' && room.gameEngine) {
-        const passRes = room.gameEngine.passAttack(socket.id);
-        if (!passRes.success) return callback && callback(passRes);
-        broadcastScopedRoom(room);
-        return callback && callback(passRes);
       }
 
       room.advanceTurn();
@@ -432,6 +503,7 @@ io.on('connection', (socket) => {
         return;
       }
 
+      const player = room.playerManager.getPlayerBySocketId(socket.id);
       let drawRes;
       if (room.gameType === 'uno') {
         drawRes = room.gameEngine.drawCard(socket.id);
@@ -446,6 +518,14 @@ io.on('connection', (socket) => {
         }
       } else {
         drawRes = { success: false, error: 'Trò chơi này không cho phép tự do bốc bài!' };
+      }
+
+      if (drawRes.success && player) {
+        io.to(room.id).emit('card_drawn_action', {
+          seat: player.seat,
+          playerName: player.name,
+          count: 1
+        });
       }
 
       broadcastScopedRoom(room);
@@ -467,7 +547,16 @@ io.on('connection', (socket) => {
         return;
       }
 
+      const player = room.playerManager.getPlayerBySocketId(socket.id);
       const res = room.gameEngine.pickUp(socket.id);
+      if (res.success && player) {
+        io.to(room.id).emit('tan_pickup_action', {
+          seat: player.seat,
+          playerName: player.name,
+          count: res.pickedUpCardsCount || 0
+        });
+      }
+
       broadcastScopedRoom(room);
       if (typeof callback === 'function') callback(res);
     } catch (err) {

@@ -120,27 +120,7 @@ class UnoClient {
   }
 
   renderUnoCard(card, size = 'normal') {
-    const el = document.createElement('div');
-    el.className = `card-punk-item ${size}`;
-    const bgColors = {
-      red: '#ef4444',
-      yellow: '#eab308',
-      green: '#22c55e',
-      blue: '#3b82f6',
-      wild: 'linear-gradient(135deg, #ef4444 25%, #3b82f6 25%, #3b82f6 50%, #22c55e 50%, #22c55e 75%, #eab308 75%)'
-    };
-
-    el.style.background = bgColors[card.color] || '#ffffff';
-    el.style.color = card.color === 'yellow' ? '#000000' : '#ffffff';
-    el.style.border = '3px solid #000';
-    el.style.boxShadow = '3px 3px 0 #000';
-
-    el.innerHTML = `
-      <div style="font-size:12px; font-weight:900; line-height:1;">${card.label || card.rank}</div>
-      <div style="font-size:26px; font-weight:900; text-align:center;">${card.label || card.rank}</div>
-      <div style="font-size:12px; font-weight:900; line-height:1; transform:rotate(180deg); text-align:right;">${card.label || card.rank}</div>
-    `;
-    return el;
+    return window.CardRenderer.renderCard(card, { size });
   }
 
   chooseColor(color) {

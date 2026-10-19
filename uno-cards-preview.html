@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BỘ BÀI UNO PIXEL ART - CARDPUNK</title>
+  <link rel="stylesheet" href="css/global.css">
+  <style>
+    body {
+      background: #1e1e24;
+      color: #fff;
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      padding: 30px 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+      color: #ffde59;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+    }
+    p.subtitle {
+      color: #94a3b8;
+      margin-bottom: 24px;
+      font-size: 15px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #22c55e;
+      color: #000;
+      margin-bottom: 20px;
+    }
+    .color-section {
+      background: #2b2b36;
+      border: 3px solid #000;
+      box-shadow: 5px 5px 0 #000;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .cards-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-preview-item {
+      background: #18181c;
+      border: 2px solid #000;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      transition: transform 0.15s;
+    }
+    .card-preview-item:hover {
+      transform: translateY(-6px) scale(1.05);
+      border-color: #ffde59;
+    }
+    .card-preview-item img {
+      width: 90px;
+      height: 134px;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      display: block;
+      border-radius: 4px;
+    }
+    .card-label {
+      font-size: 12px;
+      margin-top: 6px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🃏 Bộ Bài Uno Pixel Art (170 x 253 px)</h1>
+    <p class="subtitle">Đã tạo thành công toàn bộ 55 lá bài mẫu gốc (Pixel Deck Unique) và 108 lá bài hoàn chỉnh theo chuẩn Mattel!</p>
+    <div class="badge">ĐỘ PHÂN GIẢI CAO - GIỮ NGUYÊN HẠT PIXEL ART</div>
+
+    <!-- RED -->
+    <div class="color-section">
+      <div class="section-title">
+        <span class="dot" style="background: #d93831;"></span>
+        LÁ BÀI MÀU ĐỎ (RED)
+      </div>
+      <div class="cards-row" id="row-red"></div>
+    </div>
+
+    <!-- YELLOW -->
+    <div class="color-section">
+      <div class="section-title">
+        <span class="dot" style="background: #f5ba27;"></span>
+        LÁ BÀI MÀU VÀNG (YELLOW)
+      </div>
+      <div class="cards-row" id="row-yellow"></div>
+    </div>
+
+    <!-- GREEN -->
+    <div class="color-section">
+      <div class="section-title">
+        <span class="dot" style="background: #3ba64c;"></span>
+        LÁ BÀI MÀU LỤC (GREEN)
+      </div>
+      <div class="cards-row" id="row-green"></div>
+    </div>
+
+    <!-- BLUE -->
+    <div class="color-section">
+      <div class="section-title">
+        <span class="dot" style="background: #2482db;"></span>
+        LÁ BÀI MÀU LAM (BLUE)
+      </div>
+      <div class="cards-row" id="row-blue"></div>
+    </div>
+
+    <!-- WILDS & BACK -->
+    <div class="color-section">
+      <div class="section-title">
+        <span class="dot" style="background: #fff;"></span>
+        LÁ ĐẶC BIỆT (WILD, +4) & MẶT LƯNG
+      </div>
+      <div class="cards-row" id="row-wild"></div>
+    </div>
+  </div>
+
+  <script>
+    const types = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "skip", "reverse", "draw2"];
+    const colors = ["red", "yellow", "green", "blue"];
+
+    colors.forEach(col => {
+      const container = document.getElementById(`row-${col}`);
+      types.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'card-preview-item';
+        item.innerHTML = `
+          <img src="pixel_deck_unique/${col}_${t}.png" alt="${col} ${t}" />
+          <div class="card-label">${col}_${t}</div>
+        `;
+        container.appendChild(item);
+      });
+    });
+
+    const wildContainer = document.getElementById('row-wild');
+    [
+      { file: 'wild.png', label: 'wild (Đổi màu)' },
+      { file: 'wild_draw4.png', label: 'wild_draw4 (+4)' },
+      { file: 'card_back.png', label: 'card_back (Mặt úp)' }
+    ].forEach(w => {
+      const item = document.createElement('div');
+      item.className = 'card-preview-item';
+      item.innerHTML = `
+        <img src="pixel_deck_unique/${w.file}" alt="${w.label}" />
+        <div class="card-label">${w.label}</div>
+      `;
+      wildContainer.appendChild(item);
+    });
+  </script>
+</body>
+</html>

@@ -984,7 +984,7 @@
         </ul>
 
         <div class="nav-actions">
-          <button class="nb-btn white" style="padding: 10px 18px; font-size: 14px;">Đăng Nhập</button>
+          <button id="nav-btn-login" class="nb-btn white" style="padding: 10px 18px; font-size: 14px;">Đăng Nhập</button>
           <a href="lobby.html" class="nb-btn pink" style="padding: 10px 18px; font-size: 14px;">Chơi Ngay</a>
         </div>
       </nav>
@@ -1153,8 +1153,8 @@
             </div>
 
             <div class="game-action-row">
-              <button class="nb-btn cyan">Tạo Bàn Bài Tây</button>
-              <button class="nb-btn white">Xem Luật Chơi</button>
+              <a href="lobby.html?game=sam" class="nb-btn cyan">Tạo Bàn Sâm Lốc / 3 Lá</a>
+              <button class="nb-btn white" onclick="showRulesModal('bai-tay')">Xem Luật Chơi</button>
             </div>
           </div>
 
@@ -1217,8 +1217,8 @@
             </div>
 
             <div class="game-action-row">
-              <button class="nb-btn yellow">Tạo Phòng Uno</button>
-              <button class="nb-btn white">Chơi Với Bot</button>
+              <a href="lobby.html?game=uno" class="nb-btn yellow">Tạo Phòng Uno</a>
+              <button class="nb-btn white" onclick="showRulesModal('uno')">Luật Uno Chuẩn</button>
             </div>
           </div>
 
@@ -1241,8 +1241,8 @@
                 </div>
 
                 <div style="display: flex; gap: 8px; align-items: center; width: 100%; justify-content: center;">
-                  <button class="nb-btn pink" style="padding: 6px 14px; font-size: 12px;">HÔ UNO!</button>
-                  <button class="nb-btn white" style="padding: 6px 14px; font-size: 12px;">Rút 1 Lá</button>
+                  <button class="nb-btn pink" style="padding: 6px 14px; font-size: 12px;" onclick="showToast('🎉 Bạn đã HÔ UNO dõng dạc! Đối thủ không thể bắt phạt.')">HÔ UNO!</button>
+                  <button class="nb-btn white" style="padding: 6px 14px; font-size: 12px;" onclick="showToast('🃏 Đã rút 1 lá bài từ bộ bài Uno!')">Rút 1 Lá</button>
                 </div>
               </div>
             </div>
@@ -1274,8 +1274,8 @@
             </div>
 
             <div class="game-action-row">
-              <button class="nb-btn pink">Vào Gỡ Bom Ngay</button>
-              <button class="nb-btn white">Chiến Thuật Sống Còn</button>
+              <a href="lobby.html?game=exploding-kittens" class="nb-btn pink">Vào Gỡ Bom Ngay</a>
+              <button class="nb-btn white" onclick="showRulesModal('meo-no')">Chiến Thuật Sống Còn</button>
             </div>
           </div>
 
@@ -1301,9 +1301,9 @@
                 </div>
 
                 <div style="display: flex; gap: 8px;">
-                  <button class="nb-btn green" style="padding: 6px 14px; font-size: 12px;">GỠ BOM (1)</button>
-                  <button class="nb-btn cyan" style="padding: 6px 14px; font-size: 12px;">NHÌN TƯƠNG LAI</button>
-                  <button class="nb-btn white" style="padding: 6px 14px; font-size: 12px;">BỎ LƯỢT</button>
+                  <button class="nb-btn green" style="padding: 6px 14px; font-size: 12px;" onclick="showToast('🛡️ Đã dùng Defuse gỡ bom thành công!')">GỠ BOM (1)</button>
+                  <button class="nb-btn cyan" style="padding: 6px 14px; font-size: 12px;" onclick="showToast('🔮 Đã xem trước 3 lá bài trên đầu cọc bài!')">NHÌN TƯƠNG LAI</button>
+                  <button class="nb-btn white" style="padding: 6px 14px; font-size: 12px;" onclick="showToast('⏩ Đã nhảy qua lượt chơi an toàn!')">BỎ LƯỢT</button>
                 </div>
               </div>
             </div>
@@ -1325,26 +1325,26 @@
         <!-- Filter Bar -->
         <div class="lobby-top-toolbar">
           <div class="lobby-filter-pills">
-            <button class="filter-btn active">Tất Cả Game (84)</button>
-            <button class="filter-btn">Bài Tây (42)</button>
-            <button class="filter-btn">Uno (26)</button>
-            <button class="filter-btn">Mèo Nổ (16)</button>
+            <button class="filter-btn active" data-filter="all">Tất Cả Game (84)</button>
+            <button class="filter-btn" data-filter="bai-tay">Bài Tây (42)</button>
+            <button class="filter-btn" data-filter="uno">Uno (26)</button>
+            <button class="filter-btn" data-filter="meo-no">Mèo Nổ (16)</button>
           </div>
 
           <div style="display: flex; gap: 10px;">
-            <button class="nb-btn green" style="padding: 8px 18px; font-size: 14px;">+ Tạo Phòng Mới</button>
-            <button class="nb-btn white" style="padding: 8px 14px; font-size: 14px;">Làm Mới</button>
+            <a href="lobby.html" class="nb-btn green" style="padding: 8px 18px; font-size: 14px;">+ Tạo Phòng Mới</a>
+            <button id="btn-refresh-rooms" class="nb-btn white" style="padding: 8px 14px; font-size: 14px;">Làm Mới</button>
           </div>
         </div>
 
         <!-- Room Rows -->
-        <div class="room-list">
+        <div class="room-list" id="room-list-container">
           
           <!-- Row 1 -->
-          <div class="room-row">
+          <div class="room-row" data-type="bai-tay">
             <div class="room-id">#1042</div>
             <div class="room-name-col">
-              <div class="room-title">Tiến Lên Miền Nam - Bàn Thân Thiện Không Cay Cú</div>
+              <div class="room-title">Sâm Lốc / Tiến Lên - Bàn Thân Thiện Không Cay Cú</div>
               <div class="room-host">Chủ phòng: <span style="color: #000; font-weight: 700;">DungPro99</span></div>
             </div>
             <div>
@@ -1355,12 +1355,12 @@
               <span>3 / 4 Người</span>
             </div>
             <div>
-              <button class="nb-btn pink" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</button>
+              <a href="lobby.html?game=sam" class="nb-btn pink" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</a>
             </div>
           </div>
 
           <!-- Row 2 -->
-          <div class="room-row">
+          <div class="room-row" data-type="uno">
             <div class="room-id">#2089</div>
             <div class="room-name-col">
               <div class="room-title">Uno Đêm Muộn - Chém +4 Tới Bến</div>
@@ -1374,12 +1374,12 @@
               <span>7 / 8 Người</span>
             </div>
             <div>
-              <button class="nb-btn yellow" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</button>
+              <a href="lobby.html?game=uno" class="nb-btn yellow" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</a>
             </div>
           </div>
 
           <!-- Row 3 -->
-          <div class="room-row">
+          <div class="room-row" data-type="meo-no">
             <div class="room-id">#3105</div>
             <div class="room-name-col">
               <div class="room-title">Mèo Nổ Cười Ra Nước Mắt - Voice Chat Discord</div>
@@ -1393,26 +1393,26 @@
               <span>3 / 5 Người</span>
             </div>
             <div>
-              <button class="nb-btn pink" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</button>
+              <a href="lobby.html?game=exploding-kittens" class="nb-btn pink" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</a>
             </div>
           </div>
 
           <!-- Row 4 -->
-          <div class="room-row">
+          <div class="room-row" data-type="bai-tay">
             <div class="room-id">#1055</div>
             <div class="room-name-col">
-              <div class="room-title">Poker Texas Hold'em - Giải Đấu Mini Cuối Tuần</div>
+              <div class="room-title">Ba Cào (3 Lá) & Đánh Tấn - Tốc Độ Nhanh</div>
               <div class="room-host">Chủ phòng: <span style="color: #000; font-weight: 700;">SharkPokerVN</span></div>
             </div>
             <div>
-              <span class="nb-badge" style="background: var(--color-cyan);">POKER</span>
+              <span class="nb-badge" style="background: var(--color-cyan);">3 LÁ / TẤN</span>
             </div>
             <div class="room-capacity">
               <div class="capacity-dot"></div>
               <span>5 / 6 Người</span>
             </div>
             <div>
-              <button class="nb-btn cyan" style="padding: 8px 16px; font-size: 13px; width: 100%;">Xem Trận Đấu</button>
+              <a href="lobby.html?game=three-cards" class="nb-btn cyan" style="padding: 8px 16px; font-size: 13px; width: 100%;">Vào Bàn Ngay</a>
             </div>
           </div>
 
@@ -1459,12 +1459,12 @@
       <span class="nb-badge" style="background: var(--color-yellow); color: #000;">BẮT ĐẦU VÁN BÀI TRONG 10 GIÂY</span>
       <h2 class="cta-title">HỘI BẠN ĐANG ĐỢI MÀY ĐẤY!<br>TẠO PHÒNG VÀ GỬI LINK CHIẾN NGAY.</h2>
       <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
-        <a href="#lobbies" class="nb-btn yellow" style="font-size: 18px; padding: 14px 32px;">
+        <a href="lobby.html" class="nb-btn yellow" style="font-size: 18px; padding: 14px 32px;">
           TẠO PHÒNG MIỄN PHÍ NGAY
         </a>
-        <a href="#games" class="nb-btn white" style="font-size: 18px; padding: 14px 28px;">
+        <button class="nb-btn white" onclick="showRulesModal('all')" style="font-size: 18px; padding: 14px 28px;">
           XEM HƯỚNG DẪN LUẬT
-        </a>
+        </button>
       </div>
     </section>
 
@@ -1526,5 +1526,185 @@
     </div>
   </footer>
 
+  <!-- Rules Modal -->
+  <div id="rules-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 16px;">
+    <div class="nb-box" style="max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; background: #fff; padding: 28px; position: relative; border-radius: 16px;">
+      <button onclick="closeRulesModal()" class="nb-btn sm pink" style="position: absolute; top: 16px; right: 16px; padding: 4px 10px; font-weight: 900; font-size: 16px;">✕</button>
+      
+      <div style="margin-bottom: 20px;">
+        <span class="nb-badge" style="background: var(--color-yellow);">CẨM NANG CARDPUNK</span>
+        <h2 id="rules-modal-title" style="font-family: 'Space Grotesk'; font-size: 24px; font-weight: 900; margin-top: 8px;">LUẬT CHƠI CHI TIẾT</h2>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px;">
+        <button class="rule-tab-btn nb-btn sm yellow" data-tab="tab-sam" onclick="switchRuleTab('tab-sam')">Sâm Lốc</button>
+        <button class="rule-tab-btn nb-btn sm white" data-tab="tab-uno" onclick="switchRuleTab('tab-uno')">Uno Đại Chiến</button>
+        <button class="rule-tab-btn nb-btn sm white" data-tab="tab-tan" onclick="switchRuleTab('tab-tan')">Đánh Tấn</button>
+        <button class="rule-tab-btn nb-btn sm white" data-tab="tab-meo" onclick="switchRuleTab('tab-meo')">Mèo Nổ</button>
+        <button class="rule-tab-btn nb-btn sm white" data-tab="tab-cacao" onclick="switchRuleTab('tab-cacao')">Ba Cào (3 Lá)</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div id="tab-sam" class="rule-tab-content">
+        <h3 style="font-weight: 800; color: #d93831; margin-bottom: 8px;">🃏 Luật Sâm Lốc (Chuẩn Miền Bắc)</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 10px;">
+          • Mỗi người nhận <strong>10 lá bài</strong>.<br>
+          • <strong>Báo Sâm</strong>: Đầu ván bất kỳ ai cũng có thể Báo Sâm nếu tự tin không ai chặn được. Nếu đánh hết 10 lá về nhất mà không bị chặn: Thắng đậm gấp 3 lần! Nếu bị bất kỳ người nào chặn lại: <strong>Bị xử Thua Đền Sâm ngay lập tức</strong>!<br>
+          • Thứ tự độ lớn: 3 &lt; 4 &lt; 5 ... &lt; K &lt; A &lt; 2 (Heo lớn nhất). Không phân biệt chất khi chặn.<br>
+          • <strong>Chặn 2 (Heo)</strong>: 1 Tứ Quý chặt được 1 lá 2. Đánh 2 cuối cùng là thối 2!
+        </p>
+        <a href="lobby.html?game=sam" class="nb-btn pink sm" style="width: 100%; text-align: center;">Vào Bàn Sâm Lốc Ngay</a>
+      </div>
+
+      <div id="tab-uno" class="rule-tab-content" style="display: none;">
+        <h3 style="font-weight: 800; color: #f5ba27; margin-bottom: 8px;">🌈 Luật UNO Đại Chiến (Chuẩn Mattel)</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 10px;">
+          • Mỗi người nhận <strong>7 lá bài</strong>.<br>
+          • Đánh lá cùng màu hoặc cùng số / cùng biểu tượng chức năng.<br>
+          • <strong>Lá +2 &amp; +4</strong>: Buộc người tiếp theo rút bài và mất lượt (có hỗ trợ luật cộng dồn liên hoàn).<br>
+          • <strong>Lá Skip (Cấm) &amp; Reverse (Đổi chiều)</strong>: Lật ngược tình thế trận đấu.<br>
+          • <strong>HÔ UNO!</strong>: Khi trên tay còn 1 lá bài duy nhất, phải bấm nút "HÔ UNO" trước khi đối thủ bắt lỗi.
+        </p>
+        <a href="lobby.html?game=uno" class="nb-btn yellow sm" style="width: 100%; text-align: center;">Vào Bàn Uno Ngay</a>
+      </div>
+
+      <div id="tab-tan" class="rule-tab-content" style="display: none;">
+        <h3 style="font-weight: 800; color: #38bdf8; margin-bottom: 8px;">⚔️ Luật Đánh Tấn (Durak Nga)</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 10px;">
+          • Đầu ván bốc 1 lá ngửa dưới cọc bài để xác định <strong>Chất Trưởng</strong>.<br>
+          • <strong>Người Tấn</strong>: Đánh quân bài tấn công người bên cạnh.<br>
+          • <strong>Người Thủ</strong>: Chặn quân bài bằng lá <em>cùng chất nhưng số lớn hơn</em> (ví dụ 4 bích đỡ bằng K bích), hoặc dùng <em>quân chất Trưởng</em> bất kỳ để đỡ.<br>
+          • <strong>Bồi Công</strong>: Mọi người chơi khác có thể bồi thêm các quân có cùng số/rank đang nằm trên bàn chiến.
+        </p>
+        <a href="lobby.html?game=tan" class="nb-btn cyan sm" style="width: 100%; text-align: center;">Vào Bàn Tấn Ngay</a>
+      </div>
+
+      <div id="tab-meo" class="rule-tab-content" style="display: none;">
+        <h3 style="font-weight: 800; color: #ff5277; margin-bottom: 8px;">💣 Luật Mèo Nổ (Exploding Kittens)</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 10px;">
+          • Bốc bài theo vòng. Trong cọc bài ẩn chứa những quả bom Mèo Nổ.<br>
+          • Nếu bốc trúng Mèo Nổ mà không có lá <strong>Defuse (Gỡ Bom)</strong>: Nổ tan xác và bị loại khỏi trận!<br>
+          • Dùng lá <strong>See The Future</strong> để soi trước 3 lá, <strong>Attack / Skip</strong> để đẩy cọc bài sang đối thủ.
+        </p>
+        <a href="lobby.html?game=exploding-kittens" class="nb-btn pink sm" style="width: 100%; text-align: center;">Vào Bàn Mèo Nổ Ngay</a>
+      </div>
+
+      <div id="tab-cacao" class="rule-tab-content" style="display: none;">
+        <h3 style="font-weight: 800; color: #22c55e; margin-bottom: 8px;">⚡ Luật Ba Cào (Bài Cào 3 Lá)</h3>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin-bottom: 10px;">
+          • Mỗi người nhận <strong>3 lá bài</strong>.<br>
+          • Điểm tính theo hàng đơn vị tổng điểm 3 lá: A=1, 2-9=số, 10,J,Q,K=0 điểm.<br>
+          • <strong>Ba Tây (3 Tiên)</strong>: Cả 3 lá đều là hình người (J, Q, K) - lớn hơn cả 9 nút!
+        </p>
+        <a href="lobby.html?game=three-cards" class="nb-btn green sm" style="width: 100%; text-align: center; color: #fff;">Vào Bàn Ba Cào Ngay</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="global-toast" style="display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #000; color: #ffde59; border: 3px solid #ffde59; box-shadow: 4px 4px 0 #ffde59; border-radius: 12px; padding: 12px 24px; font-weight: 800; font-size: 15px; animation: bounce 0.3s ease;">
+    <span id="global-toast-msg">Thông báo</span>
+  </div>
+
+  <script>
+    // 1. Toast function
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('global-toast');
+      const msgEl = document.getElementById('global-toast-msg');
+      if (!toast || !msgEl) return;
+      msgEl.innerHTML = msg;
+      toast.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    // 2. Rules Modal
+    function showRulesModal(type) {
+      const modal = document.getElementById('rules-modal');
+      modal.style.display = 'flex';
+      if (type === 'uno') switchRuleTab('tab-uno');
+      else if (type === 'meo-no') switchRuleTab('tab-meo');
+      else if (type === 'tan') switchRuleTab('tab-tan');
+      else if (type === 'cacao') switchRuleTab('tab-cacao');
+      else switchRuleTab('tab-sam');
+    }
+
+    function closeRulesModal() {
+      document.getElementById('rules-modal').style.display = 'none';
+    }
+
+    function switchRuleTab(tabId) {
+      document.querySelectorAll('.rule-tab-content').forEach(el => el.style.display = 'none');
+      const activeEl = document.getElementById(tabId);
+      if (activeEl) activeEl.style.display = 'block';
+
+      document.querySelectorAll('.rule-tab-btn').forEach(btn => {
+        if (btn.dataset.tab === tabId) {
+          btn.className = 'rule-tab-btn nb-btn sm yellow';
+        } else {
+          btn.className = 'rule-tab-btn nb-btn sm white';
+        }
+      });
+    }
+
+    // Close on Escape or click background
+    document.getElementById('rules-modal').addEventListener('click', (e) => {
+      if (e.target.id === 'rules-modal') closeRulesModal();
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeRulesModal();
+    });
+
+    // 3. User Login / Name Storage
+    const loginBtn = document.getElementById('nav-btn-login');
+    const existingName = sessionStorage.getItem('cardpunk_player_name');
+    if (existingName && loginBtn) {
+      loginBtn.innerHTML = `👤 ${existingName}`;
+    }
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        const current = sessionStorage.getItem('cardpunk_player_name') || '';
+        const name = prompt('Nhập biệt danh của bạn khi chơi bài:', current);
+        if (name && name.trim()) {
+          sessionStorage.setItem('cardpunk_player_name', name.trim());
+          loginBtn.innerHTML = `👤 ${name.trim()}`;
+          showToast(`Chào mừng <strong>${name.trim()}</strong> gia nhập CARDPUNK!`);
+        }
+      });
+    }
+
+    // 4. Lobby Filter Pills
+    document.querySelectorAll('.lobby-filter-pills .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lobby-filter-pills .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        
+        document.querySelectorAll('#room-list-container .room-row').forEach(row => {
+          if (filter === 'all' || row.dataset.type === filter) {
+            row.style.display = 'grid';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 5. Refresh Button animation
+    const refreshBtn = document.getElementById('btn-refresh-rooms');
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        refreshBtn.innerText = 'Đang tải...';
+        setTimeout(() => {
+          refreshBtn.innerText = 'Làm Mới';
+          showToast('🔄 Đã cập nhật danh sách phòng trực tuyến mới nhất!');
+        }, 400);
+      });
+    }
+  </script>
 </body>
 </html>

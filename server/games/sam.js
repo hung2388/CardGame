@@ -442,7 +442,7 @@ class SamGame {
       if (this.samCallerSocketId) {
         if (this.samCallerSocketId === socketId) {
           // Sam caller successfully cleared hand without being blocked -> THẮNG SÂM!
-          return this.concludeGame(player.seat, true);
+          return this.concludeGame(player.seat, true, false);
         } else {
           // Someone else went out -> Sam caller failed and pays all (Đền Sâm)!
           const samCaller = this.room.playerManager.getPlayerBySocketId(this.samCallerSocketId);
@@ -450,7 +450,18 @@ class SamGame {
         }
       }
 
-      return this.concludeGame(player.seat, false);
+      return this.concludeGame(player.seat, false, false);
+    }
+
+    // CRITICAL SÂM RULE: If someone called Sâm, and ANOTHER player plays a valid beat combo:
+    // The Sâm caller is immediately defeated ("Đền Sâm / Đền Làng") and the game ends right away!
+    if (this.samCallerSocketId && socketId !== this.samCallerSocketId) {
+      const samCaller = this.room.playerManager.getPlayerBySocketId(this.samCallerSocketId);
+      if (samCaller) {
+        this.markBétBảng(samCaller.seat, 'Đền Sâm (Bị chặn bài)');
+        console.log(`[Sâm] Người chơi ${player.name} (Ghế #${player.seat}) đã CHẶN SÂM thành công trước ${samCaller.name}! Ván đấu kết thúc ngay lập tức (Đền Sâm).`);
+        return this.concludeGame(player.seat, false, true);
+      }
     }
 
     // Advance turn to next active player
@@ -545,7 +556,7 @@ class SamGame {
   /**
    * Conclude game and build complete rankings
    */
-  concludeGame(firstPlaceSeat, isThangSam = false) {
+  concludeGame(firstPlaceSeat, isThangSam = false, isDenSam = false) {
     this.status = 'finished';
     this.room.status = 'round_end';
     this.clearTurnTimer();
@@ -562,7 +573,7 @@ class SamGame {
         rankPosition: 1,
         isWinner: true,
         remainingCards: firstPlayer.hand.length,
-        note: isThangSam ? 'THẮNG SÂM TUYỆT ĐỐI' : 'VỀ NHẤT'
+        note: isThangSam ? 'THẮNG SÂM TUYỆT ĐỐI' : (isDenSam ? 'CHẶN SÂM THÀNH CÔNG (ĐỀN SÂM)' : 'VỀ NHẤT')
       }
     ];
 
@@ -601,12 +612,13 @@ class SamGame {
     });
 
     // Update winner score
-    if (firstPlayer) firstPlayer.score += (isThangSam ? 5 : 1);
+    if (firstPlayer) firstPlayer.score += (isThangSam ? 5 : (isDenSam ? 4 : 1));
 
     this.roundResults = {
       winnerSeat: firstPlaceSeat,
       winnerName: firstPlayer.name,
       isThangSam,
+      isDenSam,
       rankings,
       completedAt: Date.now()
     };

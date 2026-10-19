@@ -624,3 +624,78 @@
     font-size: 13px;
   }
 }
+
+/* ===================================================
+   UNO PIXEL ART STYLES & INTERACTION
+   =================================================== */
+.card-punk-item.uno-pixel-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.uno-pixel-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 3px 0 #000);
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.15s ease;
+  pointer-events: none;
+}
+
+.card-punk-item.uno-pixel-card:hover .uno-pixel-card-img {
+  transform: translateY(-8px) scale(1.05);
+  filter: drop-shadow(0 0 10px rgba(255, 222, 89, 0.8)) drop-shadow(3px 5px 0 #000);
+}
+
+.card-punk-item.uno-pixel-card.selected .uno-pixel-card-img {
+  transform: translateY(-16px) scale(1.1);
+  filter: drop-shadow(0 0 14px rgba(255, 82, 119, 0.95)) drop-shadow(4px 6px 0 #000);
+}
+
+/* ===================================================
+   DYNAMIC CARD ANIMATIONS (SHUFFLE, DEAL, PLAY, DRAW)
+   =================================================== */
+.flying-card-anim {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(-50%, -50%);
+  transition: all 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+}
+
+/* Deck Shuffling Animation FX */
+.table-deck-stack.shuffling {
+  animation: deck-shuffle-shake 0.8s ease-in-out;
+}
+
+@keyframes deck-shuffle-shake {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.12) rotate(-5deg); filter: drop-shadow(0 0 14px var(--color-yellow)); }
+  40% { transform: scale(1.15) rotate(6deg); filter: drop-shadow(0 0 18px var(--color-pink)); }
+  60% { transform: scale(1.12) rotate(-4deg); filter: drop-shadow(0 0 14px var(--color-cyan)); }
+  80% { transform: scale(1.05) rotate(2deg); filter: drop-shadow(0 0 8px var(--color-yellow)); }
+  100% { transform: scale(1) rotate(0deg); filter: none; }
+}
+
+/* Card Arrival Splash FX */
+@keyframes card-land-pop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.card-just-landed {
+  animation: card-land-pop 0.28s ease-out;
+}
+

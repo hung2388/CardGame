@@ -191,7 +191,7 @@ class TanGame {
     this.room.currentTurnSeat = this.defenderSeat; // Pass turn to defender
 
     this.checkGameWin();
-    return { success: true, tablePairs: this.tablePairs };
+    return { success: true, tablePairs: this.tablePairs, attackCards: cards };
   }
 
   /**
@@ -209,8 +209,23 @@ class TanGame {
     const defendCard = player.hand.find(c => c.id === defendCardId);
     if (!defendCard) return { success: false, error: 'Lá bài không có trong tay bạn!' };
 
-    const pair = this.tablePairs.find(p => p.attackCard.id === attackCardId && !p.defendCard);
-    if (!pair) return { success: false, error: 'Lá bài tấn công này đã được đỡ hoặc không tồn tại!' };
+    // Auto-resolve undefended attack card
+    let pair = null;
+    if (attackCardId) {
+      pair = this.tablePairs.find(p => p.attackCard.id === attackCardId && !p.defendCard);
+    }
+    // If attackCardId wasn't provided or didn't match, auto-find the first undefended card that defendCard CAN legally beat!
+    if (!pair) {
+      pair = this.tablePairs.find(p => !p.defendCard && this.canDefend(defendCard, p.attackCard));
+    }
+    // If still not found, check if there are any undefended cards at all
+    if (!pair) {
+      const anyUndefended = this.tablePairs.some(p => !p.defendCard);
+      if (!anyUndefended) {
+        return { success: false, error: 'Tất cả các lá tấn công trên bàn đã được đỡ!' };
+      }
+      return { success: false, error: 'Lá bài này không đủ sức đỡ bất kỳ lá tấn công nào trên bàn!' };
+    }
 
     if (!this.canDefend(defendCard, pair.attackCard)) {
       return { success: false, error: 'Lá bài này không đủ sức đỡ lá tấn công!' };
@@ -229,7 +244,7 @@ class TanGame {
     }
 
     this.checkGameWin();
-    return { success: true, tablePairs: this.tablePairs, allDefended };
+    return { success: true, tablePairs: this.tablePairs, allDefended, pair, defendCard };
   }
 
   /**

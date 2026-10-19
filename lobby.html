@@ -123,6 +123,18 @@
   <script>
     let selectedGame = 'three-cards';
 
+    // Support URL param ?game=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramGame = urlParams.get('game');
+    if (paramGame) {
+      const matchCard = document.querySelector(`.game-select-card[data-game="${paramGame}"]`);
+      if (matchCard) {
+        document.querySelectorAll('.game-select-card').forEach(c => c.classList.remove('active'));
+        matchCard.classList.add('active');
+        selectedGame = paramGame;
+      }
+    }
+
     // Game card selection
     document.querySelectorAll('.game-select-card').forEach(card => {
       card.addEventListener('click', () => {

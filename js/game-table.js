@@ -47,9 +47,26 @@ class GameTable {
       this.updateState(state);
     });
 
-    // Audio triggers for deal and showdown
-    window.cardpunkClient.on('cards_dealt_notice', () => {
+    // Audio & Visual Animation Triggers
+    window.cardpunkClient.on('cards_shuffling_notice', (data) => {
+      this.animateShuffle();
+    });
+
+    window.cardpunkClient.on('cards_dealt_notice', (data) => {
       if (window.soundManager) window.soundManager.playDeal();
+      this.animateDeal(data);
+    });
+
+    window.cardpunkClient.on('card_played_action', (data) => {
+      this.animatePlayCard(data);
+    });
+
+    window.cardpunkClient.on('card_drawn_action', (data) => {
+      this.animateDrawCard(data);
+    });
+
+    window.cardpunkClient.on('tan_pickup_action', (data) => {
+      this.animateTanPickUp(data);
     });
 
     window.cardpunkClient.on('round_showdown', () => {
@@ -100,21 +117,30 @@ class GameTable {
 
   /**
    * Render seated players around oval table.
-   * Viewer is ALWAYS at 3 o'clock (angle 0 rad).
-   * Other seats are distributed clockwise (increasing angle).
+   * Viewer is ALWAYS at bottom center (angle PI / 2 rad).
+   * Other seats are distributed clockwise with MAXIMUM EVEN DISTANCE (2*PI / N).
    */
   renderSeats(players, maxSeats = 8, currentTurnSeat = null) {
-    if (!this.seatsLayer) return;
+    if (!this.seatsLayer || !players || players.length === 0) return;
     this.seatsLayer.innerHTML = '';
 
-    // Ellipse radius percentages (so player boxes sit neatly on the edge of the oval felt)
-    const rxPct = 40; // 40% horizontal radius
-    const ryPct = 38; // 38% vertical radius
+    // Ellipse radius percentages (neatly placed on the edge of the oval felt)
+    const rxPct = 42; // 42% horizontal radius
+    const ryPct = 37; // 37% vertical radius
 
-    players.forEach((p) => {
-      // visualOffset: 0 is viewer at 3 o'clock (0 radians)
-      // visualOffset: 1..maxSeats distributed clockwise
-      const angle = (p.visualOffset / maxSeats) * (2 * Math.PI);
+    // Sort players in visual clockwise order starting with self (viewer at index 0)
+    const sorted = [...players].sort((a, b) => (a.visualOffset || 0) - (b.visualOffset || 0));
+    const N = sorted.length;
+
+    sorted.forEach((p, index) => {
+      // Viewer (index 0) is at bottom center: angle = PI / 2 (90 deg)
+      // Other players are distributed clockwise with MAXIMUM distance: (2 * PI / N)
+      let angle;
+      if (N === 1) {
+        angle = Math.PI / 2;
+      } else {
+        angle = (Math.PI / 2) + index * ((2 * Math.PI) / N);
+      }
       
       // Calculate coordinates on ellipse in percentages
       const xPct = 50 + rxPct * Math.cos(angle);
@@ -122,6 +148,8 @@ class GameTable {
 
       const seatEl = document.createElement('div');
       seatEl.className = `player-seat-pod nb-box ${p.isCurrentTurn ? 'active-turn' : ''} ${p.isSelf ? 'is-self' : ''}`;
+      seatEl.id = `seat-pod-${p.seat}`;
+      seatEl.dataset.seat = p.seat;
       seatEl.style.left = `${xPct}%`;
       seatEl.style.top = `${yPct}%`;
 
@@ -331,6 +359,197 @@ class GameTable {
     if (res && !res.success) {
       alert(res.error || 'Không thể bắt đầu!');
     }
+  }
+
+  /**
+   * ===================================================
+   * DYNAMIC FLUID CARD ANIMATION ENGINE
+   * ===================================================
+   */
+
+  /**
+   * Helper: Animate a floating clone card from start element to target element
+   */
+  animateFlyingCard(fromEl, toEl, cardData = null, options = {}) {
+    if (!fromEl || !toEl) return;
+    const startRect = fromEl.getBoundingClientRect();
+    const endRect = toEl.getBoundingClientRect();
+
+    if (startRect.width === 0 && startRect.height === 0) return;
+    if (endRect.width === 0 && endRect.height === 0) return;
+
+    const startX = startRect.left + startRect.width / 2;
+    const startY = startRect.top + startRect.height / 2;
+    const endX = endRect.left + endRect.width / 2;
+    const endY = endRect.top + endRect.height / 2;
+
+    const flyer = document.createElement('div');
+    flyer.className = 'flying-card-anim';
+    flyer.style.left = `${startX}px`;
+    flyer.style.top = `${startY}px`;
+
+    // Render card face if provided, else dummy card back
+    if (cardData) {
+      const cardClone = window.CardRenderer.renderCard(cardData, { size: 'normal' });
+      flyer.appendChild(cardClone);
+    } else {
+      const back = document.createElement('div');
+      back.className = 'card-punk-item normal face-down';
+      back.innerHTML = '<div class="card-inner card-back-pattern"><div class="card-back-badge">CP</div></div>';
+      flyer.appendChild(back);
+    }
+
+    const startRot = (Math.random() * 20) - 10;
+    const endRot = (Math.random() * 24) - 12;
+    flyer.style.transform = `translate(-50%, -50%) rotate(${startRot}deg) scale(0.85)`;
+
+    document.body.appendChild(flyer);
+
+    // Trigger transition on next animation frame
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        flyer.style.left = `${endX}px`;
+        flyer.style.top = `${endY}px`;
+        flyer.style.transform = `translate(-50%, -50%) rotate(${endRot}deg) scale(1)`;
+      });
+    });
+
+    const duration = options.duration || 380;
+    setTimeout(() => {
+      if (flyer.parentNode) flyer.parentNode.removeChild(flyer);
+      if (typeof options.onComplete === 'function') options.onComplete();
+    }, duration);
+  }
+
+  /**
+   * 1. Shuffle Animation
+   */
+  animateShuffle() {
+    if (window.soundManager) window.soundManager.playShuffle();
+    const deck = document.querySelector('.table-deck-stack');
+    if (deck) {
+      deck.classList.add('shuffling');
+      setTimeout(() => {
+        deck.classList.remove('shuffling');
+      }, 850);
+    }
+  }
+
+  /**
+   * 2. Deal Animation
+   */
+  animateDeal(data) {
+    const deckEl = document.querySelector('.table-deck-stack') || this.deckLayer;
+    if (!deckEl || !this.currentState || !this.currentState.players) return;
+
+    const players = this.currentState.players;
+    const cardsPerPlayer = data?.cardsPerPlayer || 3;
+    const visualDeals = Math.min(cardsPerPlayer, 4);
+
+    let step = 0;
+    for (let r = 0; r < visualDeals; r++) {
+      players.forEach((p) => {
+        const delay = step * 65;
+        step++;
+        setTimeout(() => {
+          let targetEl = p.isSelf ? this.myHandLayer : document.getElementById(`seat-pod-${p.seat}`);
+          if (targetEl && deckEl) {
+            this.animateFlyingCard(deckEl, targetEl, null, {
+              duration: 360,
+              onComplete: () => {
+                targetEl.classList.add('card-just-landed');
+                setTimeout(() => targetEl.classList.remove('card-just-landed'), 300);
+              }
+            });
+            if (window.soundManager) window.soundManager.playDeal();
+          }
+        }, delay);
+      });
+    }
+  }
+
+  /**
+   * 3. Play Card Animation (Fly from hand/seat to table center)
+   */
+  animatePlayCard(actionData) {
+    const { seat, cards = [] } = actionData || {};
+    const centerEl = this.centerCardsLayer || document.getElementById('table-center-cards');
+    if (!centerEl) return;
+
+    let fromEl = null;
+    if (this.currentState && seat === this.currentState.mySeat) {
+      fromEl = this.myHandLayer;
+    } else {
+      fromEl = document.getElementById(`seat-pod-${seat}`);
+    }
+    if (!fromEl) fromEl = this.deckLayer;
+
+    cards.forEach((card, idx) => {
+      setTimeout(() => {
+        this.animateFlyingCard(fromEl, centerEl, card, {
+          duration: 340,
+          onComplete: () => {
+            if (window.soundManager) window.soundManager.playCardDrop();
+          }
+        });
+      }, idx * 60);
+    });
+  }
+
+  /**
+   * 4. Draw Card Animation (Fly from deck to hand/seat)
+   */
+  animateDrawCard(actionData) {
+    const { seat, count = 1 } = actionData || {};
+    const deckEl = document.querySelector('.table-deck-stack') || this.deckLayer;
+    if (!deckEl) return;
+
+    let toEl = null;
+    if (this.currentState && seat === this.currentState.mySeat) {
+      toEl = this.myHandLayer;
+    } else {
+      toEl = document.getElementById(`seat-pod-${seat}`);
+    }
+    if (!toEl) return;
+
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        this.animateFlyingCard(deckEl, toEl, null, {
+          duration: 380,
+          onComplete: () => {
+            if (window.soundManager) window.soundManager.playDraw();
+            toEl.classList.add('card-just-landed');
+            setTimeout(() => toEl.classList.remove('card-just-landed'), 300);
+          }
+        });
+      }, i * 100);
+    }
+  }
+
+  /**
+   * 5. Tấn Pick Up Animation (All table cards fly into defender's hand)
+   */
+  animateTanPickUp(actionData) {
+    const { seat } = actionData || {};
+    let toEl = null;
+    if (this.currentState && seat === this.currentState.mySeat) {
+      toEl = this.myHandLayer;
+    } else {
+      toEl = document.getElementById(`seat-pod-${seat}`);
+    }
+    if (!toEl) return;
+
+    const tableCards = document.querySelectorAll('#table-center-cards .card-punk-item');
+    tableCards.forEach((cEl, idx) => {
+      setTimeout(() => {
+        this.animateFlyingCard(cEl, toEl, null, {
+          duration: 350,
+          onComplete: () => {
+            if (idx === 0 && window.soundManager) window.soundManager.playDraw();
+          }
+        });
+      }, idx * 45);
+    });
   }
 }
 
