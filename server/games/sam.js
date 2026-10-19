@@ -447,6 +447,7 @@ class SamGame {
           // Someone else went out -> Sam caller failed and pays all (Đền Sâm)!
           const samCaller = this.room.playerManager.getPlayerBySocketId(this.samCallerSocketId);
           if (samCaller) this.markBétBảng(samCaller.seat, 'Đền Sâm (Bị chặn)');
+          return this.concludeGame(player.seat, false, true);
         }
       }
 

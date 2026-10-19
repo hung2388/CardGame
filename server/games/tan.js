@@ -127,10 +127,22 @@ class TanGame {
   }
 
   getNextSeat(seat) {
+    return this.getNextActiveSeat(seat);
+  }
+
+  getNextActiveSeat(seat) {
     const players = this.room.playerManager.getAllPlayers();
     const seats = players.map(p => p.seat);
-    const idx = seats.indexOf(seat);
-    return seats[(idx + 1) % seats.length];
+    const startIdx = seats.indexOf(seat);
+    if (startIdx === -1) return seats[0];
+    for (let i = 1; i <= seats.length; i++) {
+      const s = seats[(startIdx + i) % seats.length];
+      const p = this.room.playerManager.getPlayerBySeat(s);
+      if (this.room.deckEngine.remainingCount > 0 || (p && p.hand.length > 0)) {
+        return s;
+      }
+    }
+    return seat;
   }
 
   /**
@@ -270,8 +282,8 @@ class TanGame {
     this.refillHands();
 
     // Defender loses attack turn. Next player clockwise becomes Attacker!
-    this.attackerSeat = this.getNextSeat(this.defenderSeat);
-    this.defenderSeat = this.getNextSeat(this.attackerSeat);
+    this.attackerSeat = this.getNextActiveSeat(this.defenderSeat);
+    this.defenderSeat = this.getNextActiveSeat(this.attackerSeat);
     this.room.currentTurnSeat = this.attackerSeat;
     this.status = 'attacking';
 
@@ -300,9 +312,14 @@ class TanGame {
       // Refill hands
       this.refillHands();
 
-      // Successful defender becomes the NEW attacker!
-      this.attackerSeat = this.defenderSeat;
-      this.defenderSeat = this.getNextSeat(this.attackerSeat);
+      // Successful defender becomes the NEW attacker (or next active if defender has 0 cards)
+      const defender = this.room.playerManager.getPlayerBySeat(this.defenderSeat);
+      if (defender && defender.hand.length > 0) {
+        this.attackerSeat = this.defenderSeat;
+      } else {
+        this.attackerSeat = this.getNextActiveSeat(this.defenderSeat);
+      }
+      this.defenderSeat = this.getNextActiveSeat(this.attackerSeat);
       this.room.currentTurnSeat = this.attackerSeat;
       this.status = 'attacking';
 
@@ -318,12 +335,12 @@ class TanGame {
    */
   refillHands() {
     const players = this.room.playerManager.getAllPlayers();
-    // Order: Attacker first, then others, then Defender
-    const order = [this.attackerSeat];
-    let cur = this.getNextSeat(this.attackerSeat);
-    while (cur !== this.attackerSeat) {
-      order.push(cur);
-      cur = this.getNextSeat(cur);
+    if (!players || players.length === 0) return;
+    const seats = players.map(p => p.seat);
+    const startIdx = seats.indexOf(this.attackerSeat);
+    const order = [];
+    for (let i = 0; i < seats.length; i++) {
+      order.push(seats[(startIdx + i) % seats.length]);
     }
 
     for (const seat of order) {

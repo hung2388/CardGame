@@ -157,10 +157,12 @@ class GameTable {
       const turnBadge = p.isCurrentTurn ? '<div class="turn-flair">LƯỢT ĐÁNH</div>' : '';
       const revealedBadge = p.hasRevealed && !p.revealedEvaluation ? '<div class="seat-revealed-tag">ĐÃ MỞ</div>' : '';
 
+      const nameLen = (p.name || '').length;
+      const nameFontSize = nameLen > 18 ? '10px' : (nameLen > 12 ? '11px' : '13px');
       seatEl.innerHTML = `
         ${crown}
         <div class="seat-avatar">${(p.name || 'P').charAt(0).toUpperCase()}</div>
-        <div class="seat-name">${p.name}</div>
+        <div class="seat-name" title="${p.name}" style="font-size: ${nameFontSize};">${p.name}</div>
         <div class="seat-tag">Ghế #${p.seat} ${p.isSelf ? '(Bạn)' : ''}</div>
         <div class="seat-score-badge">${p.score || 0} điểm</div>
         ${turnBadge}

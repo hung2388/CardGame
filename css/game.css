@@ -45,7 +45,7 @@
   gap: 8px;
 }
 
-/* Oval Table Stage */
+/* Oval Table Stage with Cyberpunk Pixel Gaming Lounge Wallpaper */
 .table-stage-container {
   flex: 1;
   min-height: 0;
@@ -55,25 +55,38 @@
   padding: 10px 16px;
   position: relative;
   overflow: hidden;
+  background: #090d16 url('../assets/bg/pixel_card_arena_bg.jpg') center center / cover no-repeat;
+  background-attachment: fixed;
 }
 
-/* Authentic Oval Felt Table */
+/* Atmospheric Ambient Darkening Gradient */
+.table-stage-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(15, 23, 42, 0.4) 0%, rgba(10, 15, 30, 0.85) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Authentic Oval Felt Table with Pixel Felt & Wooden Rail */
 .poker-oval-table {
   width: min(880px, 94%);
   height: min(430px, 94%);
   aspect-ratio: 2 / 1;
-  background: radial-gradient(ellipse at center, #15803d 0%, #0d5c36 60%, #064e2b 100%);
+  background: url('../assets/bg/pixel_felt_pattern.png') repeat, radial-gradient(ellipse at center, #15803d 0%, #0d5c36 60%, #064e2b 100%);
   border: 14px solid #3d2212; /* Rich wooden rail */
   outline: 4px solid #000;
   border-radius: 9999px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 0 40px rgba(0,0,0,0.6);
+  box-shadow: 0 0 0 3px #ffde59, 0 20px 50px rgba(0,0,0,0.85), inset 0 0 50px rgba(0,0,0,0.65);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 5;
 }
 
-/* Inner Gold Trim on Table */
+/* Inner Pixel Gold Trim & Table Markings */
 .poker-oval-table::before {
   content: '';
   position: absolute;
@@ -81,8 +94,22 @@
   left: 10px;
   right: 10px;
   bottom: 10px;
-  border: 2px dashed rgba(255, 222, 89, 0.4);
+  border: 3px dashed rgba(255, 222, 89, 0.5);
   border-radius: 250px;
+  pointer-events: none;
+}
+
+/* Decorative Pixel Chips on Table Rail */
+.poker-oval-table::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  right: 48px;
+  width: 96px;
+  height: 24px;
+  background: url('../assets/bg/pixel_chips.png') no-repeat center / contain;
+  opacity: 0.9;
+  filter: drop-shadow(2px 2px 0 #000);
   pointer-events: none;
 }
 
@@ -155,8 +182,10 @@
 .player-seat-pod {
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 110px;
-  padding: 8px;
+  min-width: 114px;
+  max-width: 165px;
+  width: auto;
+  padding: 8px 10px;
   background: #ffffff;
   border: 3px solid #000;
   border-radius: var(--radius-md);
@@ -186,9 +215,13 @@
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  text-align: center;
+  margin: 2px 0;
+  max-width: 145px;
 }
 
 .seat-tag {
@@ -205,9 +238,19 @@
 
 .seat-crown {
   position: absolute;
-  top: -12px;
+  top: -10px;
   right: -6px;
-  font-size: 20px;
+  background: #f59e0b;
+  color: #000;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1.5px solid #000;
+  box-shadow: 1.5px 1.5px 0 #000;
+  letter-spacing: 0.5px;
+  z-index: 5;
 }
 
 .turn-flair {
@@ -626,9 +669,10 @@
 }
 
 /* ===================================================
-   UNO PIXEL ART STYLES & INTERACTION
+   UNIVERSAL PIXEL ART CARD STYLES & INTERACTION
+   (Applies to UNO, Bài Tây, and Mèo Nổ)
    =================================================== */
-.card-punk-item.uno-pixel-card {
+.card-punk-item.pixel-card {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
@@ -639,7 +683,7 @@
   overflow: visible;
 }
 
-.uno-pixel-card-img {
+.pixel-card-img, .uno-pixel-card-img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -651,12 +695,14 @@
   pointer-events: none;
 }
 
-.card-punk-item.uno-pixel-card:hover .uno-pixel-card-img {
+.card-punk-item.pixel-card:hover .pixel-card-img,
+.card-punk-item.pixel-card:hover .uno-pixel-card-img {
   transform: translateY(-8px) scale(1.05);
-  filter: drop-shadow(0 0 10px rgba(255, 222, 89, 0.8)) drop-shadow(3px 5px 0 #000);
+  filter: drop-shadow(0 0 10px rgba(255, 222, 89, 0.85)) drop-shadow(3px 5px 0 #000);
 }
 
-.card-punk-item.uno-pixel-card.selected .uno-pixel-card-img {
+.card-punk-item.pixel-card.selected .pixel-card-img,
+.card-punk-item.pixel-card.selected .uno-pixel-card-img {
   transform: translateY(-16px) scale(1.1);
   filter: drop-shadow(0 0 14px rgba(255, 82, 119, 0.95)) drop-shadow(4px 6px 0 #000);
 }
