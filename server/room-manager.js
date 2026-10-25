@@ -104,8 +104,19 @@ class Room {
     }
 
     // Pick starter randomly from currently seated players
-    const randomPlayerIndex = secureRandomInt(0, players.length - 1);
-    this.starterSeat = players[randomPlayerIndex].seat;
+    // Anti-repeat: if >= 2 players, avoid picking the exact same starter seat consecutively
+    let candidatePlayers = players;
+    if (players.length >= 2 && this.starterSeat) {
+      const otherPlayers = players.filter(p => p.seat !== this.starterSeat);
+      if (otherPlayers.length > 0) {
+        candidatePlayers = otherPlayers;
+      }
+    }
+    const randomPlayerIndex = secureRandomInt(0, candidatePlayers.length - 1);
+    this.starterSeat = candidatePlayers[randomPlayerIndex].seat;
+
+    // Pick direction randomly (50% clockwise, 50% counter_clockwise)
+    this.direction = secureRandomInt(0, 1) === 0 ? 'clockwise' : 'counter_clockwise';
 
     // Dynamically scale decks based on player count (e.g. Sâm with 12 players = 3 decks = 156 cards)
     let deckCount = this.config.deckCount || 1;

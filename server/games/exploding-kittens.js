@@ -259,7 +259,11 @@ class ExplodingKittensGame {
     let idx = seats.indexOf(this.room.currentTurnSeat);
 
     do {
-      idx = (idx + 1) % seats.length;
+      if (this.room.direction === 'clockwise') {
+        idx = (idx + 1) % seats.length;
+      } else {
+        idx = (idx - 1 + seats.length) % seats.length;
+      }
     } while (this.eliminatedSeats.has(seats[idx]));
 
     return seats[idx];

@@ -176,7 +176,7 @@ class TableSpinner {
   }
 
   renderStarterWheel(players, targetSeat, doneCallback) {
-    const starterPlayer = players.find(p => p.seat === targetSeat) || {};
+    const starterPlayer = players.find(p => Number(p.seat) === Number(targetSeat)) || {};
     const starterName = starterPlayer.name || `Ghế #${targetSeat}`;
 
     this.container.innerHTML = `
@@ -206,8 +206,9 @@ class TableSpinner {
     this.drawWheel(canvas, slices);
 
     // Exact alignment math with pointer at 3 o'clock (0 degrees):
-    const targetIdx = players.findIndex(p => p.seat === targetSeat);
-    const N = players.length;
+    const rawTargetIdx = players.findIndex(p => Number(p.seat) === Number(targetSeat));
+    const targetIdx = rawTargetIdx >= 0 ? rawTargetIdx : 0;
+    const N = Math.max(1, players.length);
     const sliceDeg = 360 / N;
     // Target sector center angle in resting canvas:
     const targetMidDeg = (targetIdx + 0.5) * sliceDeg;

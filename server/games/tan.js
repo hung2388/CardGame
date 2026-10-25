@@ -136,7 +136,13 @@ class TanGame {
     const startIdx = seats.indexOf(seat);
     if (startIdx === -1) return seats[0];
     for (let i = 1; i <= seats.length; i++) {
-      const s = seats[(startIdx + i) % seats.length];
+      let nextIndex;
+      if (this.room.direction === 'clockwise') {
+        nextIndex = (startIdx + i) % seats.length;
+      } else {
+        nextIndex = (startIdx - i + seats.length * 10) % seats.length;
+      }
+      const s = seats[nextIndex];
       const p = this.room.playerManager.getPlayerBySeat(s);
       if (this.room.deckEngine.remainingCount > 0 || (p && p.hand.length > 0)) {
         return s;
