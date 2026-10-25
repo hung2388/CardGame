@@ -71,11 +71,11 @@
 
 /* Authentic Oval Felt Table with Pixel Felt & Wooden Rail */
 .poker-oval-table {
-  width: min(880px, 94%);
-  height: min(430px, 94%);
-  aspect-ratio: 2 / 1;
+  width: min(1280px, 98%);
+  height: min(580px, 96%);
+  aspect-ratio: 2.15 / 1;
   background: url('../assets/bg/pixel_felt_pattern.png') repeat, radial-gradient(ellipse at center, #15803d 0%, #0d5c36 60%, #064e2b 100%);
-  border: 14px solid #3d2212; /* Rich wooden rail */
+  border: clamp(8px, 1.6vw, 14px) solid #3d2212; /* Rich wooden rail */
   outline: 4px solid #000;
   border-radius: 9999px;
   box-shadow: 0 0 0 3px #ffde59, 0 20px 50px rgba(0,0,0,0.85), inset 0 0 50px rgba(0,0,0,0.65);
@@ -90,12 +90,12 @@
 .poker-oval-table::before {
   content: '';
   position: absolute;
-  top: 10px;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  border: 3px dashed rgba(255, 222, 89, 0.5);
-  border-radius: 250px;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2.5px dashed rgba(255, 222, 89, 0.45);
+  border-radius: 9999px;
   pointer-events: none;
 }
 
@@ -113,29 +113,38 @@
   pointer-events: none;
 }
 
-/* Table Center Elements */
+/* Table Center Elements (Always above avatars and seat pods) */
 .table-center-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  z-index: 5;
+  gap: 10px;
+  z-index: 35 !important;
+  pointer-events: auto;
 }
 
 .table-center-cards {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  max-width: 620px;
   gap: 8px;
-  min-height: 120px;
+  min-height: 105px;
+  padding: 8px 18px;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 222, 89, 0.45);
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.4);
+  z-index: 36 !important;
 }
 
 .table-empty-center-msg {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -182,14 +191,14 @@
 .player-seat-pod {
   position: absolute;
   transform: translate(-50%, -50%);
-  min-width: 114px;
-  max-width: 165px;
+  min-width: 88px;
+  max-width: 130px;
   width: auto;
-  padding: 8px 10px;
+  padding: 4px 8px;
   background: #ffffff;
-  border: 3px solid #000;
-  border-radius: var(--radius-md);
-  box-shadow: 4px 4px 0 #000;
+  border: 2.5px solid #000;
+  border-radius: var(--radius-sm);
+  box-shadow: 2.5px 2.5px 0 #000;
   text-align: center;
   pointer-events: auto;
   z-index: 10;
@@ -198,71 +207,74 @@
 
 .player-seat-pod.active-turn {
   background: var(--color-yellow);
-  box-shadow: 0 0 0 4px #ff5277, 6px 6px 0 #000;
-  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 0 0 3px #ff5277, 4px 4px 0 #000;
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 .player-seat-pod.is-self {
   border-color: #0284c7;
+  background: #f0f9ff;
 }
 
 .seat-avatar {
-  font-size: 24px;
-  margin-bottom: 2px;
+  font-size: 18px;
+  line-height: 1;
+  margin-bottom: 1px;
 }
 
 .seat-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
-  font-size: 13px;
-  line-height: 1.25;
+  font-size: 11px;
+  line-height: 1.2;
   word-break: break-word;
   overflow-wrap: anywhere;
   white-space: normal;
   text-align: center;
-  margin: 2px 0;
-  max-width: 145px;
+  margin: 1px 0;
+  max-width: 115px;
 }
 
 .seat-tag {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #64748b;
+  line-height: 1;
 }
 
 .seat-card-count {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .seat-crown {
   position: absolute;
-  top: -10px;
-  right: -6px;
+  top: -8px;
+  right: -5px;
   background: #f59e0b;
   color: #000;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 900;
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 1px 5px;
+  border-radius: 3px;
   border: 1.5px solid #000;
-  box-shadow: 1.5px 1.5px 0 #000;
+  box-shadow: 1px 1px 0 #000;
   letter-spacing: 0.5px;
   z-index: 5;
 }
 
 .turn-flair {
   position: absolute;
-  bottom: -10px;
+  bottom: -9px;
   left: 50%;
   transform: translateX(-50%);
   background: #ff5277;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 900;
-  padding: 2px 6px;
+  padding: 1px 6px;
   border: 1.5px solid #000;
   border-radius: var(--radius-pill);
   white-space: nowrap;
@@ -274,24 +286,52 @@
   to { transform: translateX(-50%) translateY(-3px); }
 }
 
-/* Opponent Hand Fan */
+/* Opponent Hand Fan (Positioned outwards so it never overlaps the table center) */
 .opponent-hand-fan {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  margin-top: 6px;
+  margin-top: 4px;
+  z-index: 12;
+}
+
+.player-seat-pod.pos-top .opponent-hand-fan,
+.player-seat-pod.pos-top .opponent-showdown-cards {
+  top: auto !important;
+  bottom: 100% !important;
+  margin-bottom: 4px !important;
+  margin-top: 0 !important;
+}
+
+.player-seat-pod.pos-left .opponent-hand-fan,
+.player-seat-pod.pos-left .opponent-showdown-cards {
+  left: 100% !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin-left: 6px !important;
+  margin-top: 0 !important;
+}
+
+.player-seat-pod.pos-right .opponent-hand-fan,
+.player-seat-pod.pos-right .opponent-showdown-cards {
+  right: 100% !important;
+  left: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin-right: 6px !important;
+  margin-top: 0 !important;
 }
 
 .opponent-mini-card {
-  width: 22px;
-  height: 32px;
+  width: 20px;
+  height: 28px;
   border: 1.5px solid #000;
   border-radius: 3px;
   background: #1e293b;
   box-shadow: 1px 1px 0 #000;
-  margin-left: -12px;
+  margin-left: -10px;
 }
 
 /* Card Styling (Neo-Brutalism) */
@@ -377,14 +417,19 @@
   transform: translateY(-20px) scale(1.05);
   box-shadow: 0 0 0 3px var(--color-yellow), 6px 8px 0 #000;
   border-color: #000;
+  z-index: 95 !important;
 }
 
-.card-punk-item.large:hover {
-  transform: translateY(-8px);
+.card-punk-item.large:hover,
+.card-punk-item:hover {
+  transform: translateY(-10px);
+  z-index: 90 !important;
 }
 
-.card-punk-item.large.selected:hover {
-  transform: translateY(-24px) scale(1.05);
+.card-punk-item.large.selected:hover,
+.card-punk-item.selected:hover {
+  transform: translateY(-24px) scale(1.08);
+  z-index: 100 !important;
 }
 
 /* Player Hand Bottom Console */
@@ -393,19 +438,19 @@
   background: #ffffff;
   border-top: var(--border-width) solid #000;
   box-shadow: 0 -4px 0 #000;
-  padding: 8px 18px 10px;
+  padding: 6px 16px 8px;
   z-index: 20;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .turn-banner {
-  padding: 5px 12px;
+  padding: 4px 12px;
   border: 2px solid #000;
   border-radius: var(--radius-sm);
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   text-align: center;
 }
@@ -426,16 +471,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .my-hand-cards {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 8px 4px 6px;
-  min-height: 120px;
+  align-items: flex-end;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px 4px;
+  min-height: 105px;
+  overflow: visible;
+  position: relative;
 }
 
 .empty-hand-hint {
@@ -646,26 +697,241 @@
   box-shadow: 0 0 0 2px #ff5277, 4px 4px 0 #000 !important;
 }
 
-/* Mobile & Tablet Responsiveness */
+/* ===================================================
+   RESPONSIVE TABLE EXPANSION & LANDSCAPE OPTIMIZATION
+   =================================================== */
+
+/* Tablet & Smaller Screens: Keep table wide and open (No shrinking thumbnail) */
 @media (max-width: 1024px) {
   .poker-oval-table {
-    transform: scale(0.85);
+    width: 98%;
+    height: 96%;
   }
 }
 
 @media (max-width: 768px) {
   .poker-oval-table {
-    transform: scale(0.62);
-    margin: -70px 0;
+    width: 98%;
+    height: 96%;
+    border-width: 9px;
   }
-  .arena-hand-console {
-    padding: 10px 14px;
+  .player-seat-pod {
+    min-width: 76px;
+    max-width: 110px;
+    padding: 3px 6px;
+  }
+  .seat-name {
+    font-size: 10px;
+    max-width: 95px;
   }
   .card-punk-item.large {
-    width: 66px;
-    height: 96px;
+    width: 58px;
+    height: 84px;
     font-size: 13px;
   }
+  .card-punk-item.normal {
+    width: 52px;
+    height: 76px;
+  }
+}
+
+/* Landscape Mode on Phones / Small Height Devices (Crucial for Mobile Gaming) */
+@media (max-height: 550px) {
+  .arena-header {
+    padding: 3px 12px;
+    height: 38px;
+  }
+  .arena-title-box {
+    gap: 8px;
+  }
+  .room-chip {
+    font-size: 12px;
+    padding: 3px 8px;
+    gap: 4px;
+  }
+  .nb-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .table-stage-container {
+    padding: 2px 8px;
+  }
+  .poker-oval-table {
+    width: 98%;
+    height: 96%;
+    border-width: 8px;
+    box-shadow: 0 0 0 2px #ffde59, 0 10px 30px rgba(0,0,0,0.85);
+  }
+  .table-center-cards {
+    min-height: 80px;
+    padding: 4px 12px;
+    gap: 6px;
+  }
+  .table-center-content {
+    gap: 6px;
+  }
+  .arena-hand-console {
+    padding: 3px 12px 5px;
+    gap: 3px;
+    box-shadow: 0 -2px 0 #000;
+  }
+  .turn-banner {
+    padding: 2px 8px;
+    font-size: 11px;
+  }
+  .hand-content-row {
+    gap: 8px;
+  }
+  .my-hand-cards {
+    min-height: 76px;
+    padding: 4px 2px 2px;
+  }
+  .card-punk-item.large {
+    width: 50px;
+    height: 74px;
+  }
+  .card-punk-item.normal {
+    width: 46px;
+    height: 68px;
+  }
+  .hand-action-buttons {
+    min-width: 90px;
+    gap: 4px;
+  }
+  .hand-action-buttons .nb-btn {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .player-seat-pod {
+    min-width: 72px;
+    max-width: 100px;
+    padding: 2px 5px;
+  }
+}
+
+/* ===================================================
+   MOBILE ORIENTATION ROTATE HELPER MODAL
+   =================================================== */
+.orientation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(9, 13, 22, 0.94);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+@media screen and (orientation: portrait) and (max-width: 900px) {
+  body:not(.dismiss-orientation) .orientation-overlay {
+    display: flex;
+  }
+}
+
+.orientation-modal {
+  width: min(390px, 92vw);
+  padding: 28px 22px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  box-shadow: var(--shadow-xl);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.phone-rotate-anim {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-device {
+  width: 38px;
+  height: 68px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 0 #000;
+  animation: phoneRotateLoop 2.4s ease-in-out infinite;
+}
+
+.phone-screen {
+  width: 80%;
+  height: 80%;
+  background: var(--color-yellow);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-card-symbol {
+  font-size: 18px;
+}
+
+@keyframes phoneRotateLoop {
+  0%, 15% {
+    transform: rotate(0deg);
+  }
+  45%, 75% {
+    transform: rotate(-90deg) scale(1.1);
+  }
+  90%, 100% {
+    transform: rotate(0deg);
+  }
+}
+
+.rotate-glow-circle {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border: 2px dashed var(--color-pink);
+  border-radius: 50%;
+  animation: spinGlow 6s linear infinite;
+}
+
+@keyframes spinGlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.orientation-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: #000;
+}
+
+.orientation-desc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.orientation-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.orientation-actions .nb-btn {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 16px;
 }
 
 /* ===================================================

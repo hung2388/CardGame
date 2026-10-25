@@ -86,6 +86,13 @@ class GameTable {
         );
       }
     });
+
+    // Re-fan hand cards on window resize or orientation rotation
+    window.addEventListener('resize', () => {
+      if (this.currentState && this.currentState.myHand) {
+        this.renderMyHand(this.currentState.myHand, this.currentState.isMyTurn);
+      }
+    });
   }
 
   updateState(state) {
@@ -124,9 +131,10 @@ class GameTable {
     if (!this.seatsLayer || !players || players.length === 0) return;
     this.seatsLayer.innerHTML = '';
 
-    // Ellipse radius percentages (neatly placed on the edge of the oval felt)
-    const rxPct = 42; // 42% horizontal radius
-    const ryPct = 37; // 37% vertical radius
+    // Ellipse radius percentages: pushed outward onto the wooden rail perimeter
+    // leaving the central green felt completely open for played cards
+    const rxPct = 46.5; // 46.5% horizontal radius
+    const ryPct = 43.5; // 43.5% vertical radius
 
     // Sort players in visual clockwise order starting with self (viewer at index 0)
     const sorted = [...players].sort((a, b) => (a.visualOffset || 0) - (b.visualOffset || 0));
@@ -146,8 +154,24 @@ class GameTable {
       const xPct = 50 + rxPct * Math.cos(angle);
       const yPct = 50 + ryPct * Math.sin(angle);
 
+      // Determine positional quadrant to position opponent cards away from table center
+      let posClass = '';
+      if (yPct < 44) {
+        posClass += ' pos-top';
+      } else if (yPct > 60) {
+        posClass += ' pos-bottom';
+      } else {
+        posClass += ' pos-middle';
+      }
+
+      if (xPct < 38) {
+        posClass += ' pos-left';
+      } else if (xPct > 62) {
+        posClass += ' pos-right';
+      }
+
       const seatEl = document.createElement('div');
-      seatEl.className = `player-seat-pod nb-box ${p.isCurrentTurn ? 'active-turn' : ''} ${p.isSelf ? 'is-self' : ''}`;
+      seatEl.className = `player-seat-pod nb-box ${p.isCurrentTurn ? 'active-turn' : ''} ${p.isSelf ? 'is-self' : ''} ${posClass}`;
       seatEl.id = `seat-pod-${p.seat}`;
       seatEl.dataset.seat = p.seat;
       seatEl.style.left = `${xPct}%`;
@@ -158,7 +182,7 @@ class GameTable {
       const revealedBadge = p.hasRevealed && !p.revealedEvaluation ? '<div class="seat-revealed-tag">ĐÃ MỞ</div>' : '';
 
       const nameLen = (p.name || '').length;
-      const nameFontSize = nameLen > 18 ? '10px' : (nameLen > 12 ? '11px' : '13px');
+      const nameFontSize = nameLen > 18 ? '10px' : (nameLen > 12 ? '11px' : '12px');
       seatEl.innerHTML = `
         ${crown}
         <div class="seat-avatar">${(p.name || 'P').charAt(0).toUpperCase()}</div>
@@ -240,7 +264,8 @@ class GameTable {
   }
 
   /**
-   * Render only the viewer's cards in hand
+   * Render only the viewer's cards in hand with dynamic fanning / overlapping
+   * so all cards are visible at a glance without horizontal scroll cutting them off
    */
   renderMyHand(myCards, isMyTurn) {
     if (!this.myHandLayer) return;
@@ -255,13 +280,36 @@ class GameTable {
       ? this.samClient.sortHand(myCards)
       : myCards;
 
-    cardsToRender.forEach((card) => {
+    const count = cardsToRender.length;
+    // Calculate hand container width
+    const containerWidth = this.myHandLayer.getBoundingClientRect().width || (window.innerWidth - 180);
+    const isCompact = window.innerHeight <= 550 || window.innerWidth <= 768;
+    const cardSize = isCompact ? 'normal' : 'large';
+    const cardBaseWidth = isCompact ? 54 : 72;
+
+    // Calculate dynamic negative margin (fanning) so all cards fit without scrolling
+    let overlapMargin = 0;
+    const naturalWidth = count * (cardBaseWidth + 6);
+    const maxAvailable = Math.max(280, containerWidth - 20);
+
+    if (count > 1 && naturalWidth > maxAvailable) {
+      const excess = naturalWidth - maxAvailable;
+      overlapMargin = -Math.min(cardBaseWidth * 0.72, Math.ceil(excess / (count - 1)) + 2);
+    }
+
+    cardsToRender.forEach((card, idx) => {
       const isSelected = this.selectedCardIds.has(card.id);
       const cardEl = window.CardRenderer.renderCard(card, {
         isSelected,
-        size: 'large',
+        size: cardSize,
         onClick: (c) => this.toggleCardSelect(c.id)
       });
+
+      if (idx > 0 && overlapMargin < 0) {
+        cardEl.style.marginLeft = `${overlapMargin}px`;
+      }
+      cardEl.style.zIndex = isSelected ? 80 : (idx + 1);
+
       this.myHandLayer.appendChild(cardEl);
     });
   }

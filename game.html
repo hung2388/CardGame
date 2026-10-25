@@ -2,12 +2,38 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>CARDPUNK - Bàn Đấu Game Bài Trực Tuyến</title>
   <link rel="stylesheet" href="css/global.css">
   <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
+
+  <!-- Mobile Landscape Orientation Helper Modal -->
+  <div id="orientation-overlay" class="orientation-overlay">
+    <div class="orientation-modal nb-box">
+      <div class="phone-rotate-anim">
+        <div class="phone-device">
+          <div class="phone-screen">
+            <span class="phone-card-symbol">🃏</span>
+          </div>
+        </div>
+        <div class="rotate-glow-circle"></div>
+      </div>
+      <h2 class="orientation-title">XOAY NGANG ĐIỆN THOẠI</h2>
+      <p class="orientation-desc">
+        Bàn đấu sẽ tự động mở rộng toàn màn hình, hiển thị đầy đủ tất cả lá bài trên tay và vị trí các người chơi!
+      </p>
+      <div class="orientation-actions">
+        <button id="btn-force-landscape" class="nb-btn yellow lg">
+          🔄 Bật Toàn Màn Hình & Xoay Ngang
+        </button>
+        <button id="btn-dismiss-orientation" class="nb-btn white sm">
+          Tiếp tục xem dọc
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Spinner Overlay Modal (Synchronized Wheel Animation) -->
   <div id="spinner-overlay" class="spinner-overlay"></div>
@@ -25,7 +51,10 @@
         <div class="nb-badge" id="game-title-display" style="background: var(--color-cyan);">Ba Cào (3 Lá)</div>
       </div>
 
-      <div style="display: flex; gap: 10px; align-items: center;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="btn-toggle-fullscreen" class="nb-btn sm white" title="Chế độ toàn màn hình ngang" onclick="toggleLandscapeMode()">
+          ⛶ Xoay Ngang
+        </button>
         <button id="btn-start-game" class="nb-btn green sm" style="display: none;">
           Bắt Đầu Ván
         </button>
@@ -91,8 +120,75 @@
       });
     }
 
+    // Toggle and enforce mobile landscape orientation
+    async function toggleLandscapeMode() {
+      try {
+        if (!document.fullscreenElement) {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            await document.documentElement.webkitRequestFullscreen();
+          }
+        }
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (e) {
+        console.warn('Orientation request:', e);
+      }
+    }
+
+    function initOrientationSupport() {
+      const overlay = document.getElementById('orientation-overlay');
+      const btnForce = document.getElementById('btn-force-landscape');
+      const btnDismiss = document.getElementById('btn-dismiss-orientation');
+
+      if (btnForce) {
+        btnForce.addEventListener('click', async () => {
+          await toggleLandscapeMode();
+          document.body.classList.add('dismiss-orientation');
+          if (overlay) overlay.style.display = 'none';
+        });
+      }
+
+      if (btnDismiss) {
+        btnDismiss.addEventListener('click', () => {
+          document.body.classList.add('dismiss-orientation');
+          if (overlay) overlay.style.display = 'none';
+        });
+      }
+
+      function evaluateOrientation() {
+        const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+        const isMobile = window.innerWidth <= 900 || window.innerHeight <= 550 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        
+        if (!isPortrait) {
+          if (overlay) overlay.style.display = 'none';
+        } else if (isMobile && !document.body.classList.contains('dismiss-orientation')) {
+          if (overlay) overlay.style.display = 'flex';
+        }
+      }
+
+      window.addEventListener('resize', evaluateOrientation);
+      window.addEventListener('orientationchange', evaluateOrientation);
+      evaluateOrientation();
+
+      // Attempt orientation lock on first touch gesture on mobile
+      const onInitialTouch = async () => {
+        window.removeEventListener('touchstart', onInitialTouch);
+        if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && screen.orientation && screen.orientation.lock) {
+          try {
+            await screen.orientation.lock('landscape');
+          } catch (e) {}
+        }
+      };
+      window.addEventListener('touchstart', onInitialTouch, { passive: true, once: true });
+    }
+
     // Auto join on page load if params present
     window.addEventListener('DOMContentLoaded', () => {
+      initOrientationSupport();
+
       const table = new GameTable();
       window.gameTableInstance = table;
 
